@@ -751,16 +751,22 @@ bool Network::publishString(const char* prefix, const char *topic, const char *v
     return _device->mqttPublish(path, MQTT_QOS_LEVEL, true, value) > 0;
 }
 
-void Network::publishHASSConfig(char* deviceType, const char* baseTopic, char* name, char* uidString, const char* availabilityTopic, const bool& hasKeypad, char* lockAction, char* unlockAction, char* openAction)
+void Network::publishHASSConfig(char* deviceType, const char* baseTopic, Config _nukiConfig, const char* availabilityTopic, const bool& hasKeypad, char* lockAction, char* unlockAction, char* openAction)
 {
     JsonDocument json;
     json.clear();
+    
+    char uidString[20];
+    itoa(_nukiConfig.nukiId, uidString, 16);
+
     JsonObject dev = json["dev"].to<JsonObject>();
     JsonArray ids = dev["ids"].to<JsonArray>();
     ids.add(String("nuki_") + uidString);
     json["dev"]["mf"] = "Nuki";
     json["dev"]["mdl"] = deviceType;
-    json["dev"]["name"] = name;
+    json["dev"]["name"] = (char*)_nukiConfig.name;
+    json["dev"]["hw"] = _nukiConfig->hardwareVersion().c_str();
+    json["dev"]["sw"] = _nukiConfig->firmwareVersion().c_str();
 
     String cuUrl = _preferences->getString(preference_mqtt_hass_cu_url);
 
