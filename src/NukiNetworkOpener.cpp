@@ -339,7 +339,7 @@ void NukiNetworkOpener::publishKeyTurnerState(const NukiOpener::OpenerState& key
 
         if(_haEnabled)
         {
-            publishState(keyTurnerState);
+            publishState(keyTurnerState.lockState);
         }
     }
 
